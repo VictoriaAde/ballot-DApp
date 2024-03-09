@@ -7,6 +7,7 @@ import {
   useWeb3ModalAccount,
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
+import { toast } from "react-toastify";
 
 const useVote = (id) => {
   const { chainId } = useWeb3ModalAccount();
@@ -30,16 +31,19 @@ const useVote = (id) => {
         return console.log("vote successful!");
       }
 
-      console.log("vote failed!");
+      toast.error("vote failed!");
     } catch (error) {
       console.log(error);
       let errorText;
       if (error.reason === "Has no right to vote") {
         errorText = "You have not right to vote";
+        toast.error("You have not right to vote");
       } else if (error.reason === "Already voted.") {
         errorText = "You have already voted";
+        toast.error("You have already voted");
       } else {
         errorText = "An unknown error occurred";
+        toast.error("An unknown error occurred");
       }
 
       console.error("error: ", errorText);
