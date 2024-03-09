@@ -9,7 +9,7 @@ import {
 } from "@web3modal/ethers/react";
 import { toast } from "react-toastify";
 
-const useGiveRightToVote = (address) => {
+const useDelegate = (address) => {
   const { chainId } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
 
@@ -22,7 +22,7 @@ const useGiveRightToVote = (address) => {
     const contract = getProposalsContract(signer);
 
     try {
-      const estimatedGas = await contract.giveRightToVote.estimateGas(address);
+      const estimatedGas = await contract.delegate.estimateGas(address);
       // console.log("estimatedGas: ", estimatedGas);
 
       // const feeData = await readWriteProvider.getFeeData();
@@ -33,7 +33,7 @@ const useGiveRightToVote = (address) => {
 
       // console.log("estimated: ", gasFee);
 
-      const transaction = await contract.giveRightToVote(address, {
+      const transaction = await contract.delegate(address, {
         gasLimit: estimatedGas,
       });
       console.log("transaction: ", transaction);
@@ -42,14 +42,14 @@ const useGiveRightToVote = (address) => {
       console.log("receipt: ", receipt);
 
       if (receipt.status) {
-        return toast.success("giveRightToVote successful!");
+        return toast.success("delegate successful!");
       }
 
-      console.log("giveRightToVote failed!");
+      console.log("delegate failed!");
     } catch (error) {
       console.error("error: ", error);
     }
   }, [address, chainId, walletProvider]);
 };
 
-export default useGiveRightToVote;
+export default useDelegate;
