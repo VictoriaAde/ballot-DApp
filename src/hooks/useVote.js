@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { isSupportedChain } from "../utils";
-import { isAddress } from "ethers";
+// import { isAddress } from "ethers";
 import { getProvider } from "../constants/providers";
 import { getProposalsContract } from "../constants/contracts";
 import {
@@ -8,47 +8,43 @@ import {
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 
-const useGiveRightToVote = (address) => {
+const useVote = (id) => {
   const { chainId } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
 
   return useCallback(async () => {
     if (!isSupportedChain(chainId)) return console.error("Wrong network");
-    if (!isAddress(address)) return console.error("Invalid address");
     const readWriteProvider = getProvider(walletProvider);
     const signer = await readWriteProvider.getSigner();
 
     const contract = getProposalsContract(signer);
 
     try {
-      const estimatedGas = await contract.giveRightToVote.estimateGas(address);
-      // console.log("estimatedGas: ", estimatedGas);
-
-      // const feeData = await readWriteProvider.getFeeData();
-
-      // console.log("feeData: ", feeData);
-
-      // const gasFee = estimatedGas * feeData.gasPrice;
-
-      // console.log("estimated: ", gasFee);
-
-      const transaction = await contract.giveRightToVote(address, {
-        gasLimit: estimatedGas,
-      });
+      const transaction = await contract.vote(id);
       console.log("transaction: ", transaction);
       const receipt = await transaction.wait();
 
       console.log("receipt: ", receipt);
 
       if (receipt.status) {
-        return console.log("giveRightToVote successful!");
+        return console.log("vote successful!");
       }
 
-      console.log("giveRightToVote failed!");
+      console.log("vote failed!");
     } catch (error) {
-      console.error("error: ", error);
+      console.log(error);
+      let errorText;
+      if (error.reason === "Has no right to vote") {
+        errorText = "You have not right to vote";
+      } else if (error.reason === "Already voted.") {
+        errorText = "You have already voted";
+      } else {
+        errorText = "An unknown error occurred";
+      }
+
+      console.error("error: ", errorText);
     }
-  }, [address, chainId, walletProvider]);
+  }, [chainId, id, walletProvider]);
 };
 
-export default useGiveRightToVote;
+export default useVote;
