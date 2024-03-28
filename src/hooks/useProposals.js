@@ -14,7 +14,7 @@ const useProposals = () => {
     const contract = getProposalsContract(readOnlyProvider);
 
     contract
-      .getAllProposal()
+      .getAllProposals()
       .then((res) => {
         const converted = res.map((item) => ({
           name: decodeBytes32String(item.name),
